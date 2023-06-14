@@ -144,6 +144,8 @@ namespace sc {
     }
     //retorna verdadeiro se a lista tiver vazia
     bool empty() const { return head->next==nullptr; }
+    //retorna o primeiro valor da lista
+    const_reference front() const { if(!empty()) return head->next; }
     //imprimir os elementos em uma string
     string to_string() {
         ostringstream oss;
