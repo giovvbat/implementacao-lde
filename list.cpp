@@ -184,32 +184,16 @@ class sc::list {
 
     //métodos de acesso com iteradores
     //retorna o primeiro nó da lista
-    MyFowardIterator<T> begin() { 
-        if(!empty()) 
-            return MyFowardIterator<T>(m_head->next); 
-        return MyFowardIterator<T>(); 
-    }
+    MyFowardIterator<T> begin() { return MyFowardIterator<T>(m_head->next); }
 
     //retorna o último nó da lista
-    MyFowardIterator<T> end() { 
-        if(!empty()) 
-            return MyFowardIterator<T>(m_tail); 
-        return MyFowardIterator<T>(); 
-    }
+    MyFowardIterator<T> end() { return MyFowardIterator<T>(m_tail); }
 
     //retorna o primeiro nó da lista de forma constante
-    const MyFowardIterator<T> cbegin() const { 
-        if(!empty()) 
-            return MyFowardIterator<T>(m_head->next); 
-        return MyFowardIterator<T>(); 
-    }
+    const MyFowardIterator<T> cbegin() const { return MyFowardIterator<T>(m_head->next); }
 
     //retorna o último nó da lista de forma constante
-    const MyFowardIterator<T> cend() const { 
-        if(!empty()) 
-            return MyFowardIterator<T>(m_tail); 
-        return MyFowardIterator<T>(); 
-    }
+    const MyFowardIterator<T> cend() const { return MyFowardIterator<T>(m_tail); }
 
 }; 
 
