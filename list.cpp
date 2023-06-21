@@ -151,6 +151,12 @@ class sc::list {
     //substitui o conteúdo da lista pelos elementos da ilist
     void assign(initializer_list<T> ilist) { assign(ilist.begin(), ilist.end()); }
 
+    //método auxiliar para o merge sort
+    void merge(list &other);
+
+    //mergesort
+    void sort();
+
     //friends
     //sobrecarga do ==
     friend bool operator==(const list& lhs, const list& rhs) {
@@ -335,38 +341,21 @@ void sc::list<T>::clear() {
 
 template<typename T>
 void sc::list<T>::push_front(const T& value) {
-    Node<T> *nn=new Node<T>(value, nullptr, m_head);
-    if(empty()) {
-        m_head->next=nn;
-        nn->next=m_tail;
-        m_tail->prev=nn;
-        m_len++;
-        return;
-    }
+    Node<T> *nn=new Node<T>(value, nullptr, nullptr);
     nn->next=m_head->next;
     m_head->next->prev=nn;
-    m_head->next=nn;
     nn->prev=m_head;
+    m_head->next=nn;
     m_len++;
 }
 
 template<typename T>
 void sc::list<T>::push_back(const T& value) {
-    Node<T> *nn=new Node<T>(value, nullptr, m_head);
-    Node<T> *prev=m_head;
-    if(empty()) {
-        m_head->next=nn;
-        nn->next=m_tail;
-        m_tail->prev=nn;
-        m_len++;
-        return;
-    }
-    while(prev->next != m_tail)
-        prev=prev->next;
+    Node<T> *nn=new Node<T>(value, nullptr, nullptr);
     nn->next=m_tail;
+    m_tail->prev->next=nn;
+    nn->prev=m_tail->prev;
     m_tail->prev=nn;
-    prev->next=nn;
-    nn->prev=prev;
     m_len++;
 }
 
@@ -405,23 +394,67 @@ void sc::list<T>::assign(InItr first, InItr last) {
     }
 }
 
+template<typename T>
+void sc::list<T>::merge(list &other) {
+    if(this == &other)
+        return;
+    Node<T> *runner=m_head->next;
+    Node<T> *runnero=other.m_head->next;
+    while(runner != m_tail && runnero != other.m_tail) {
+        if(runner->data <= runnero->data)
+            runner=runner->next;
+        else {
+            Node<T> *next=runnero->next;
+            runner->prev->next=runnero;
+            runnero->prev=runner->prev;
+            runnero->next=runner;
+            runner->prev=runnero;
+            runnero=next;
+        }
+    }
+    while(runnero != other.m_tail) {
+        Node<T> *before=m_tail->prev;
+        Node<T> *next=runnero->next;
+        next=runnero->next;
+        before->next=runnero;
+        runnero->prev=before;
+        runnero->next=m_tail;
+        m_tail->prev=runnero;
+        before=runnero;
+        runnero=next;
+    }
+    m_len+=other.m_len;
+    other.m_len=0;
+    other.m_head->next=other.m_tail;
+    other.m_tail->prev=other.m_head;
+}
+
+template<typename T>
+void sc::list<T>::sort() {
+    if(m_len<2)
+        return;
+    size_type len=m_len/2;
+    MyFowardIterator<T> lb=begin(), re=end(), le=lb;
+    for(auto i=0;i<len;i++)
+        ++le;
+    sc::list<T> L(lb, le);
+    sc::list<T> R(le, re);
+    //cout<<L.to_string()<<endl;
+    L.sort();
+    R.sort();
+    R.merge(L);
+}
+
 int main() {
     //int A[]={9, 8, 7, 6, 5, 6, 4, 0};
     //auto n=sizeof(A)/sizeof(int);
-    initializer_list<int> numbers={-67, 6, 6, 0, 6, 6, 7, 8, 99, 0, 6, 100, 101};
+    initializer_list<int> numbers={3, 2, 1};
     sc::list<int> lista(numbers);
-    sc::list<int>list;
+    sc::list<int> list(lista.begin(), lista.end());
 
-    list.assign(lista.begin(), lista.end());
+    list.sort();
 
-    sc::MyFowardIterator<int> i, j;
-    i=list.cbegin();
-
-    while(i != list.cend()) {
-        *i=*i+1;
-        cout<<*i<<" ";
-        ++i;
-    }
-
+    cout<<list.to_string();
+    
     return 0;
 }
